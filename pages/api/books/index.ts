@@ -6,20 +6,35 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  // 책 목록을 조회
   if (req.method === "GET") {
     try {
-      // MySQL2에서 반환하는 타입을 RowDataPacket[]로 추론
       const [rows] = await pool.query("SELECT * FROM books");
-
-      // 반환된 rows를 Book[]로 타입 선언
       const books = rows as Book[];
-
       res.status(200).json(books);
     } catch (error) {
       res.status(500).json({ error: "데이터베이스 쿼리 실패" });
     }
+  }
+  // 책 추가
+  else if (req.method === "POST") {
+    const { title, author, stock } = req.body;
+
+    if (!title || !author || !stock) {
+      return res.status(400).json({ error: "모든 필드를 입력해야 합니다." });
+    }
+
+    try {
+      await pool.query(
+        "INSERT INTO books (title, author, stock) VALUES (?, ?, ?)",
+        [title, author, stock]
+      );
+      res.status(201).json({ message: "책이 성공적으로 추가되었습니다." });
+    } catch (error) {
+      res.status(500).json({ error: "데이터베이스 쿼리 실패" });
+    }
   } else {
-    res.setHeader("Allow", ["GET"]);
-    res.status(405).end("Get 요청만 가능합니다.");
+    res.setHeader("Allow", ["GET", "POST"]);
+    res.status(405).end("허용되지 않은 응답 처리입니다.");
   }
 }
