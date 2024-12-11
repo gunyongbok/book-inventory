@@ -8,10 +8,12 @@ const BooksPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
+  console.log(books);
+
   // 서버에서 책 목록을 가져오는 함수
   const fetchBooks = async () => {
     try {
-      const res = await fetch("/api/books"); // API 호출
+      const res = await fetch("/api/books");
       const data = await res.json();
       setBooks(data);
     } catch (error) {
@@ -23,6 +25,7 @@ const BooksPage = () => {
     fetchBooks();
   }, []);
 
+  // 책 목록에서 현재 페이지에 해당하는 책들을 가져오는 로직
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentBooks = books.slice(startIndex, endIndex);
@@ -31,6 +34,39 @@ const BooksPage = () => {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+  };
+
+  // 1개의 랜덤한 책을 추가하는 함수
+  const addRandomBook = async () => {
+    const newBook = {
+      title: `Random Book ${Math.floor(Math.random() * 1000) + 1}`,
+      author: `Random Author ${Math.floor(Math.random() * 1000) + 1}`,
+      stock: Math.floor(Math.random() * 100) + 1,
+    };
+
+    try {
+      const res = await fetch("/api/books", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newBook),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        console.log(data.message);
+        fetchBooks();
+      } else {
+        const errorData = await res.json();
+        console.error(
+          "책 추가에 실패했습니다:",
+          errorData.error || "알 수 없는 오류"
+        );
+      }
+    } catch (error) {
+      console.error("책 추가 요청에 실패했습니다.", error);
+    }
   };
 
   return (
@@ -70,6 +106,15 @@ const BooksPage = () => {
           disabled={currentPage === totalPages}
         >
           Next
+        </button>
+      </div>
+
+      <div className="flex justify-center mt-4">
+        <button
+          className="px-4 py-2 border rounded bg-blue-500 text-white"
+          onClick={addRandomBook}
+        >
+          랜덤 책 1개 추가
         </button>
       </div>
     </div>
