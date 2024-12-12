@@ -15,9 +15,11 @@ export default async function handler(
       const books = result as Book[];
 
       res.status(200).json(books);
-    } catch (error) {
+    } catch (error: unknown) {
       console.log(error);
-      res.status(500).json({ error });
+      if (error instanceof Error) {
+        res.status(500).json({ error: error.message });
+      }
     }
   }
   // 책 추가
@@ -59,9 +61,11 @@ export default async function handler(
           .status(201)
           .json({ message: "책이 성공적으로 추가되었습니다." });
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.log(error);
-      res.status(500).json({ error });
+      if (error instanceof Error) {
+        res.status(500).json({ error: error.message });
+      }
     }
   } else {
     res.setHeader("Allow", ["GET", "POST"]);
