@@ -15,8 +15,9 @@ export default async function handler(
       const books = result as Book[];
 
       res.status(200).json(books);
-    } catch {
-      res.status(500).json({ error: "데이터베이스 쿼리 실패" });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error });
     }
   }
   // 책 추가
@@ -58,8 +59,9 @@ export default async function handler(
           .status(201)
           .json({ message: "책이 성공적으로 추가되었습니다." });
       }
-    } catch {
-      res.status(500).json({ error: "데이터베이스 쿼리 실패" });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error });
     }
   } else {
     res.setHeader("Allow", ["GET", "POST"]);
