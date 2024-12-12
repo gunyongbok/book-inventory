@@ -1,7 +1,13 @@
 import { Suspense } from "react";
 import BookDetails from "./BookDetails";
 
-const BookPage = ({ params }: { params: { id: string } }) => {
+type PageProps = {
+  params: {
+    id: string;
+  };
+};
+
+const BookPage = async ({ params }: PageProps) => {
   return (
     <Suspense fallback={<div>로딩 중...</div>}>
       <BookDetails id={params.id} />
