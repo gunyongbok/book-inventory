@@ -1,3 +1,5 @@
+"use server";
+
 import { neon } from "@neondatabase/serverless";
 import { Book } from "@/types";
 import { NextApiRequest, NextApiResponse } from "next";
@@ -6,11 +8,10 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  const sql = neon(`${process.env.DATABASE_URL}`);
   // 책 목록을 조회
   if (req.method === "GET") {
     try {
-      ("use server");
-      const sql = neon(`${process.env.DATABASE_URL}`);
       const result = await sql("SELECT * FROM books");
 
       const books = result as Book[];
@@ -32,9 +33,6 @@ export default async function handler(
     }
 
     try {
-      ("use server");
-      const sql = neon(`${process.env.DATABASE_URL}`);
-
       const result = await sql(
         "SELECT * FROM books WHERE title = $1 AND author = $2",
         [title, author]
