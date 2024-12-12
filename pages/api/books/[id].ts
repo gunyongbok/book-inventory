@@ -1,3 +1,5 @@
+"use server";
+
 import { neon } from "@neondatabase/serverless";
 import { Book } from "@/types";
 import { NextApiRequest, NextApiResponse } from "next";

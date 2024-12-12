@@ -767,7 +767,7 @@
 
 "@neondatabase/serverless@^0.10.4":
   version "0.10.4"
-  resolved "https://registry.npmjs.org/@neondatabase/serverless/-/serverless-0.10.4.tgz"
+  resolved "https://registry.yarnpkg.com/@neondatabase/serverless/-/serverless-0.10.4.tgz#71322528fac0e69da562789e479f1b03d887b17e"
   integrity sha512-2nZuh3VUO9voBauuh+IGYRhGU/MskWHt1IuZvHcJw6GLjDgtqj/KViKo7SIrLdGLdot7vFbiRRw+BgEy3wT9HA==
   dependencies:
     "@types/pg" "8.11.6"
