@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 const BooksPage = () => {
   const [books, setBooks] = useState<Book[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [newBook, setNewBook] = useState({ title: "", author: "", stock: "" });
   const itemsPerPage = 10;
   const router = useRouter();
 
@@ -36,27 +37,26 @@ const BooksPage = () => {
     setCurrentPage(page);
   };
 
-  // 1개의 랜덤한 책을 추가하는 함수
-  const addRandomBook = async () => {
-    const newBook = {
-      title: `Random Book ${Math.floor(Math.random() * 1000) + 1}`,
-      author: `Random Author ${Math.floor(Math.random() * 1000) + 1}`,
-      stock: Math.floor(Math.random() * 100) + 1,
-    };
-
+  // 사용자가 입력한 책 정보를 추가하는 함수
+  const addBook = async () => {
     try {
       const res = await fetch("/api/books", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(newBook),
+        body: JSON.stringify({
+          title: newBook.title,
+          author: newBook.author,
+          stock: parseInt(newBook.stock),
+        }),
       });
 
       if (res.ok) {
         const data = await res.json();
         console.log(data.message);
         fetchBooks();
+        setNewBook({ title: "", author: "", stock: "" });
       } else {
         const errorData = await res.json();
         console.error(
@@ -95,7 +95,7 @@ const BooksPage = () => {
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
         >
-          Previous
+          이전
         </button>
         {Array.from({ length: totalPages }, (_, index) => (
           <button
@@ -113,17 +113,41 @@ const BooksPage = () => {
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
         >
-          Next
+          다음
         </button>
       </div>
 
-      <div className="flex justify-center mt-4">
-        <button
-          className="px-4 py-2 border rounded bg-blue-500 text-white"
-          onClick={addRandomBook}
-        >
-          랜덤 책 1개 추가
-        </button>
+      <div className="mt-8">
+        <h2 className="text-lg font-bold mb-4">원하는 새로운 책 추가하기</h2>
+        <div className="space-y-2">
+          <input
+            type="text"
+            placeholder="Title"
+            value={newBook.title}
+            onChange={(e) => setNewBook({ ...newBook, title: e.target.value })}
+            className="w-full border px-2 py-1"
+          />
+          <input
+            type="text"
+            placeholder="Author"
+            value={newBook.author}
+            onChange={(e) => setNewBook({ ...newBook, author: e.target.value })}
+            className="w-full border px-2 py-1"
+          />
+          <input
+            type="number"
+            placeholder="Stock"
+            value={newBook.stock}
+            onChange={(e) => setNewBook({ ...newBook, stock: e.target.value })}
+            className="w-full border px-2 py-1"
+          />
+          <button
+            className="px-4 py-2 border rounded bg-blue-500 text-white"
+            onClick={addBook}
+          >
+            추가하기
+          </button>
+        </div>
       </div>
     </div>
   );
