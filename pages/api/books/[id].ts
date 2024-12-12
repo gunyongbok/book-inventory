@@ -6,59 +6,24 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { id } = req.query;
-  const sql = neon(`${process.env.DATABASE_URL}`);
-
-  // 책 상세 조회
+  // 책 목록을 조회
   if (req.method === "GET") {
-    if (!id) {
-      return res.status(400).json({ error: "책 id가 없습니다." });
-    }
     try {
-      const result = await sql("SELECT * FROM books WHERE id = $1", [id]);
+      const sql = neon(`${process.env.DATABASE_URL}`);
+      const result = await sql("SELECT * FROM books");
+
       const books = result as Book[];
 
-      if (books.length === 0) {
-        return res
-          .status(404)
-          .json({ error: "해당 id를 가진 책은 존재하지 않습니다." });
-      }
-      res.status(200).json(books[0]);
-    } catch {
-      res.status(500).json({ error: "데이터베이스 쿼리 실패" });
+      res.status(200).json(books);
+    } catch (error: any) {
+      console.error("Error occurred:", error);
+      res.status(500).json({
+        details: error.message,
+      });
     }
   }
-
-  // 책 삭제
-  else if (req.method === "DELETE") {
-    if (!id) {
-      return res.status(400).json({ error: "책 id가 없습니다." });
-    }
-
-    try {
-      const result = await sql("SELECT * FROM books WHERE id = $1", [id]);
-      const books = result as Book[];
-
-      if (books.length === 0) {
-        return res
-          .status(404)
-          .json({ error: "해당 id를 가진 책은 존재하지 않습니다." });
-      }
-
-      await sql("DELETE FROM books WHERE id = $1", [id]);
-
-      res.status(200).json({ message: "책이 성공적으로 삭제되었습니다." });
-    } catch {
-      res.status(500).json({ error: "데이터베이스 쿼리 실패" });
-    }
-  }
-
-  // 책 수정
-  else if (req.method === "PUT") {
-    if (!id) {
-      return res.status(400).json({ error: "책 id가 없습니다." });
-    }
-
+  // 책 추가
+  else if (req.method === "POST") {
     const { title, author, stock } = req.body;
 
     if (!title || !author || !stock) {
@@ -66,27 +31,45 @@ export default async function handler(
     }
 
     try {
-      const result = await sql("SELECT * FROM books WHERE id = $1", [id]);
-      const books = result as Book[];
+      const sql = neon(`${process.env.DATABASE_URL}`);
 
-      if (books.length === 0) {
-        return res
-          .status(404)
-          .json({ error: "해당 id를 가진 책은 존재하지 않습니다." });
-      }
-
-      // 책 정보 수정
-      await sql(
-        "UPDATE books SET title = $1, author = $2, stock = $3 WHERE id = $4",
-        [title, author, stock, id]
+      const result = await sql(
+        "SELECT * FROM books WHERE title = $1 AND author = $2",
+        [title, author]
       );
 
-      res.status(200).json({ message: "책 정보가 성공적으로 수정되었습니다." });
-    } catch {
-      res.status(500).json({ error: "데이터베이스 쿼리 실패" });
+      const existingBooks = result as Book[];
+
+      if (existingBooks.length > 0) {
+        const bookId = existingBooks[0].id;
+        const newStock = existingBooks[0].stock + stock;
+
+        await sql("UPDATE books SET stock = $1 WHERE id = $2", [
+          newStock,
+          bookId,
+        ]);
+
+        return res.status(200).json({
+          message: "책이 이미 존재하여 수량이 업데이트되었습니다.",
+        });
+      } else {
+        await sql(
+          "INSERT INTO books (title, author, stock) VALUES ($1, $2, $3)",
+          [title, author, stock]
+        );
+        return res
+          .status(201)
+          .json({ message: "책이 성공적으로 추가되었습니다." });
+      }
+    } catch (error: any) {
+      console.error("Error occurred:", error);
+      res.status(500).json({
+        error: "데이터베이스 쿼리 실패",
+        details: error.message,
+      });
     }
   } else {
-    res.setHeader("Allow", ["GET", "DELETE", "PUT"]);
+    res.setHeader("Allow", ["GET", "POST"]);
     res.status(405).end("허용되지 않은 응답 처리입니다.");
   }
 }
