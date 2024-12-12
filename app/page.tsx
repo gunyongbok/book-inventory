@@ -8,7 +8,7 @@ const BooksPage = () => {
   const [books, setBooks] = useState<Book[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  const router = useRouter(); // useRouter hook initialization
+  const router = useRouter();
 
   // 서버에서 책 목록을 가져오는 함수
   const fetchBooks = async () => {
@@ -81,7 +81,7 @@ const BooksPage = () => {
           <div
             key={book.id}
             className="border p-2 cursor-pointer"
-            onClick={() => handleBookClick(book.id)} // 클릭 시 해당 책의 상세 페이지로 이동
+            onClick={() => handleBookClick(book.id)}
           >
             <h2 className="font-semibold text-center">{book.title}</h2>
             <p className="text-center">Author: {book.author}</p>
