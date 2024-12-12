@@ -76,46 +76,53 @@ const BooksPage = () => {
   return (
     <div className="p-4">
       <h1 className="text-xl font-bold mb-4">Books List</h1>
-      <div className="grid grid-cols-5 gap-4 mb-4">
-        {currentBooks.map((book) => (
-          <div
-            key={book.id}
-            className="border p-2 cursor-pointer"
-            onClick={() => handleBookClick(book.id)}
-          >
-            <h2 className="font-semibold text-center">{book.title}</h2>
-            <p className="text-center">Author: {book.author}</p>
-            <p className="text-center">Stock: {book.stock}</p>
+
+      {books.length === 0 ? (
+        <p className="text-center text-gray-500">책이 없습니다.</p>
+      ) : (
+        <>
+          <div className="grid grid-cols-5 gap-4 mb-4">
+            {currentBooks.map((book) => (
+              <div
+                key={book.id}
+                className="border p-2 cursor-pointer"
+                onClick={() => handleBookClick(book.id)}
+              >
+                <h2 className="font-semibold text-center">{book.title}</h2>
+                <p className="text-center">Author: {book.author}</p>
+                <p className="text-center">Stock: {book.stock}</p>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-      <div className="flex justify-center items-center space-x-2">
-        <button
-          className="px-3 py-1 border rounded"
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          이전
-        </button>
-        {Array.from({ length: totalPages }, (_, index) => (
-          <button
-            key={index}
-            className={`px-3 py-1 border rounded ${
-              currentPage === index + 1 ? "bg-gray-200" : ""
-            }`}
-            onClick={() => handlePageChange(index + 1)}
-          >
-            {index + 1}
-          </button>
-        ))}
-        <button
-          className="px-3 py-1 border rounded"
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-        >
-          다음
-        </button>
-      </div>
+          <div className="flex justify-center items-center space-x-2">
+            <button
+              className="px-3 py-1 border rounded"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              이전
+            </button>
+            {Array.from({ length: totalPages }, (_, index) => (
+              <button
+                key={index}
+                className={`px-3 py-1 border rounded ${
+                  currentPage === index + 1 ? "bg-gray-200" : ""
+                }`}
+                onClick={() => handlePageChange(index + 1)}
+              >
+                {index + 1}
+              </button>
+            ))}
+            <button
+              className="px-3 py-1 border rounded"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              다음
+            </button>
+          </div>
+        </>
+      )}
 
       <div className="mt-8">
         <h2 className="text-lg font-bold mb-4">원하는 새로운 책 추가하기</h2>

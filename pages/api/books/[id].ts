@@ -1,4 +1,4 @@
-import pool from "@/lib/db";
+import { neon } from "@neondatabase/serverless";
 import { Book } from "@/types";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -7,6 +7,7 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const { id } = req.query;
+  const sql = neon(`${process.env.DATABASE_URL}`);
 
   // 책 상세 조회
   if (req.method === "GET") {
@@ -14,8 +15,8 @@ export default async function handler(
       return res.status(400).json({ error: "책 id가 없습니다." });
     }
     try {
-      const [rows] = await pool.query("SELECT * FROM books WHERE id = ?", [id]);
-      const books = rows as Book[];
+      const result = await sql("SELECT * FROM books WHERE id = $1", [id]);
+      const books = result as Book[];
 
       if (books.length === 0) {
         return res
@@ -35,15 +36,16 @@ export default async function handler(
     }
 
     try {
-      const [rows] = await pool.query("SELECT * FROM books WHERE id = ?", [id]);
+      const result = await sql("SELECT * FROM books WHERE id = $1", [id]);
+      const books = result as Book[];
 
-      if ((rows as Book[]).length === 0) {
+      if (books.length === 0) {
         return res
           .status(404)
           .json({ error: "해당 id를 가진 책은 존재하지 않습니다." });
       }
 
-      await pool.query("DELETE FROM books WHERE id = ?", [id]);
+      await sql("DELETE FROM books WHERE id = $1", [id]);
 
       res.status(200).json({ message: "책이 성공적으로 삭제되었습니다." });
     } catch {
@@ -64,17 +66,18 @@ export default async function handler(
     }
 
     try {
-      const [rows] = await pool.query("SELECT * FROM books WHERE id = ?", [id]);
+      const result = await sql("SELECT * FROM books WHERE id = $1", [id]);
+      const books = result as Book[];
 
-      if ((rows as Book[]).length === 0) {
+      if (books.length === 0) {
         return res
           .status(404)
           .json({ error: "해당 id를 가진 책은 존재하지 않습니다." });
       }
 
       // 책 정보 수정
-      await pool.query(
-        "UPDATE books SET title = ?, author = ?, stock = ? WHERE id = ?",
+      await sql(
+        "UPDATE books SET title = $1, author = $2, stock = $3 WHERE id = $4",
         [title, author, stock, id]
       );
 
