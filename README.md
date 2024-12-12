@@ -8,6 +8,26 @@
 
 ## 설정하기
 
+### 0. Node Js 설치
+
+**Node.js 공식 웹사이트에서 설치**:
+
+- [Node.js 다운로드 페이지](https://nodejs.org/)에 접속합니다.
+- 최신 버전(LTS 추천)을 다운로드하고 설치합니다.
+
+**설치 확인**: 설치 후, 터미널에서 다음 명령어를 입력하여 Node.js가 정상적으로 설치되었는지 확인할 수 있습니다.
+
+```
+node -v
+npm -v
+```
+
+**Yarn을 사용하는 경우**: Yarn을 사용하려면, 다음 명령어로 Yarn을 설치할 수 있습니다.
+
+```
+npm install -g yarn
+```
+
 ### **1. Next.js + TypeScript 프로젝트 생성**
 
 먼저 Next.js 프로젝트를 생성하고, TypeScript를 사용할 수 있도록 설정합니다.
