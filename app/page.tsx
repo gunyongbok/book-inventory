@@ -8,6 +8,7 @@ const BooksPage = () => {
   const [books, setBooks] = useState<Book[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [newBook, setNewBook] = useState({ title: "", author: "", stock: "" });
+  const [searchQuery, setSearchQuery] = useState("");
   const itemsPerPage = 10;
   const router = useRouter();
 
@@ -32,6 +33,15 @@ const BooksPage = () => {
   const currentBooks = books.slice(startIndex, endIndex);
 
   const totalPages = Math.ceil(books.length / itemsPerPage);
+
+  // 검색어에 따라 책 목록을 필터링하는 로직
+  const filteredBooks = currentBooks.filter((book) => {
+    const lowercasedQuery = searchQuery.toLowerCase();
+    return (
+      book.title.toLowerCase().includes(lowercasedQuery) ||
+      book.author.toLowerCase().includes(lowercasedQuery)
+    );
+  });
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -77,12 +87,22 @@ const BooksPage = () => {
     <div className="p-4">
       <h1 className="text-xl font-bold mb-4">Books List</h1>
 
-      {books.length === 0 ? (
-        <p className="text-center text-gray-500">책이 없습니다.</p>
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="제목 또는 작가로 원하는 책 찾기"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full border px-2 py-1"
+        />
+      </div>
+
+      {filteredBooks.length === 0 ? (
+        <p className="text-center text-gray-500">검색 결과가 없습니다.</p>
       ) : (
         <>
           <div className="grid grid-cols-5 gap-4 mb-4">
-            {currentBooks.map((book) => (
+            {filteredBooks.map((book) => (
               <div
                 key={book.id}
                 className="border p-2 cursor-pointer"
