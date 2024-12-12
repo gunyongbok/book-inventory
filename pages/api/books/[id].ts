@@ -23,7 +23,7 @@ export default async function handler(
           .json({ error: "해당 id를 가진 책은 존재하지 않습니다." });
       }
       res.status(200).json(books[0]);
-    } catch (error) {
+    } catch {
       res.status(500).json({ error: "데이터베이스 쿼리 실패" });
     }
   }
@@ -46,7 +46,7 @@ export default async function handler(
       await pool.query("DELETE FROM books WHERE id = ?", [id]);
 
       res.status(200).json({ message: "책이 성공적으로 삭제되었습니다." });
-    } catch (error) {
+    } catch {
       res.status(500).json({ error: "데이터베이스 쿼리 실패" });
     }
   }
@@ -79,7 +79,7 @@ export default async function handler(
       );
 
       res.status(200).json({ message: "책 정보가 성공적으로 수정되었습니다." });
-    } catch (error) {
+    } catch {
       res.status(500).json({ error: "데이터베이스 쿼리 실패" });
     }
   } else {
