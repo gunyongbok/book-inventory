@@ -11,6 +11,17 @@ export default async function handler(
     try {
       const [rows] = await pool.query("SELECT * FROM books");
       const books = rows as Book[];
+
+      // 데이터가 없으면 목업 데이터를 반환
+      if (books.length === 0) {
+        const mockBooks: Book[] = [
+          { id: 1, title: "목업 책 1", author: "저자 1", stock: 10 },
+          { id: 2, title: "목업 책 2", author: "저자 2", stock: 15 },
+          { id: 3, title: "목업 책 3", author: "저자 3", stock: 20 },
+        ];
+        return res.status(200).json(mockBooks);
+      }
+
       res.status(200).json(books);
     } catch {
       res.status(500).json({ error: "데이터베이스 쿼리 실패" });
